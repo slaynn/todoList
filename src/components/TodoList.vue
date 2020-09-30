@@ -7,7 +7,7 @@
     <div class="main">
       <input type="checkbox" class="toggle-all" v-model="allDone">
       <ul class="todo-list">
-        <li class="todo" v-for="todo in todos" v-bind:key="todo">
+        <li class="todo" v-for="todo in todos" v-bind:key="todo.id"  :class="{completed: todo.completed, editing: todo == editedTodo}">
           <div class="view">
              <input type="checkbox" v-model="todo.completed" class="toggle">
             <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
@@ -37,10 +37,12 @@ export default {
     return {
       todos: [
         {
+          id: 1,
           name : 'premiere tache',
           completed : false
         },
         {
+          id : 2,
           name : 'seconde tache',
           completed : true
         }
@@ -55,17 +57,22 @@ export default {
   methods: {
     addTodo(){
       this.todos.push({
+        id : this.todos.length + 1,
         completed:false,
         name : this.newTodo
       })
       this.newTodo = '' 
+    },
+    editTodo(todo){
+      this.todos.indexOf(todo).name = todo.name
+    },
+    deleteTodo(todo){
+      var index = this.todos.indexOf(todo);
+      this.todos.splice(index, 1);
     }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
 
-</style>
 <style src="./app.css"></style>
