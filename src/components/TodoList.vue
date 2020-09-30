@@ -7,7 +7,7 @@
     <div class="main">
       <input type="checkbox" class="toggle-all" v-model="allDone">
       <ul class="todo-list">
-        <li class="todo" v-for="todo in todos" v-bind:key="todo.id"  :class="{completed: todo.completed, editing: todo == editedTodo}">
+        <li class="todo" v-for="todo in filteredTodos" v-bind:key="todo.id"  :class="{completed: todo.completed, editing: todo == editedTodo}">
           <div class="view">
              <input type="checkbox" v-model="todo.completed" class="toggle">
             <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
@@ -16,7 +16,7 @@
         </li>
       </ul>
     </div>
-    <!--
+    
     <footer class="footer" v-show="hasTodos">
       <span class="todo-count"><strong>{{ remaining }}</strong> tâches à faire</span>
       <ul class="filters">
@@ -26,7 +26,7 @@
       </ul>
       <button class="clear-completed" v-show="completed" @click.prevent="deleteCompleted">Supprimer les tâches finies</button>
     </footer>
-    -->
+    
   </section>
 </template>
 
@@ -51,7 +51,8 @@ export default {
       newTodo: '',
       filter: 'all',
       editing: null,
-      oldTodo: ''
+      oldTodo: '',
+      editedTodo
     }
   },
   methods: {
@@ -69,6 +70,25 @@ export default {
     deleteTodo(todo){
       var index = this.todos.indexOf(todo);
       this.todos.splice(index, 1);
+    }
+  },
+  computed: {
+    remaining () { 
+      //return this.todos.filter(todo => !todo.completed).length 
+      return this.todos.filter(function (todo){
+        return !todo.completed
+      }).length
+    },
+    hasTodos () {
+      return this.todos.length > 0
+    },
+    filteredTodos () {
+      if (this.filter === 'todo') {
+        return this.todos.filter(todo => !todo.completed)
+      } else if (this.filter === 'done') {
+        return this.todos.filter(todo => todo.completed)
+      }
+      return this.todos
     }
   }
 }
