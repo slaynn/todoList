@@ -1,98 +1,238 @@
 <template>
   <section class="todoapp">
-    <header class="header">
-      <h1>Todos</h1>
-      <input type="text" class="new-todo" placeholder="Ajouter une tache" v-model="newTodo" @keyup.enter="addTodo">
-    </header>
+    <h2>{{ todolist.name }}</h2>
+    <div class="">
+      <input
+        type="text"
+        class="new-todo"
+        placeholder="Ajouter une tache"
+        v-model="newTodo"
+        @keyup.enter="addTodo"
+      />
+    </div>
     <div class="main">
-      <input type="checkbox" class="toggle-all" v-model="allDone">
+      <input type="checkbox" class="toggle-all" v-model="allDone" />
       <ul class="todo-list">
-        <li class="todo" v-for="todo in filteredTodos" v-bind:key="todo.id"  :class="{completed: todo.completed, editing: todo == editedTodo}">
+        <li
+          class="todo"
+          v-for="todo in filteredTodos"
+          v-bind:key="todo.id"
+          :class="{ completed: todo.completed, editing: todo == editing }"
+        >
           <div class="view">
-             <input type="checkbox" v-model="todo.completed" class="toggle">
+            <input
+              type="checkbox"
+              v-model="todo.completed"
+              class="toggle"
+              v-on:change="changeTodoStatus(todo)"
+            />
             <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
             <button class="destroy" @click.prevent="deleteTodo(todo)"></button>
           </div>
+          <input
+            type="text"
+            class="edit"
+            v-model="todo.name"
+            @keyup.enter="doneEditing()"
+            @blur="doneEditing()"
+            @keyup.esc="cancelEditing()"
+            v-focus="todo == editing"
+          />
+        </li>
+      </ul>
+      <ul class="todo-list">
+        Encours
+        <li
+          class="todo"
+          v-for="todo in notdoneTodos"
+          v-bind:key="todo.id"
+          :class="{ completed: todo.completed, editing: todo == editing }"
+        >
+          <div class="view">
+            <input
+              type="checkbox"
+              v-model="todo.completed"
+              class="toggle"
+              v-on:change="changeTodoStatus(todo)"
+            />
+            <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
+            <button class="destroy" @click.prevent="deleteTodo(todo)"></button>
+          </div>
+          <input
+            type="text"
+            class="edit"
+            v-model="todo.name"
+            @keyup.enter="doneEditing()"
+            @blur="doneEditing()"
+            @keyup.esc="cancelEditing()"
+            v-focus="todo == editing"
+          />
+        </li>
+      </ul>
+      <ul class="todo-list">
+        Finies
+        <li
+          class="todo"
+          v-for="todo in doneTodos"
+          v-bind:key="todo.id"
+          :class="{ completed: todo.completed, editing: todo == editing }"
+        >
+          <div class="view">
+            <input
+              type="checkbox"
+              v-model="todo.completed"
+              class="toggle"
+              v-on:change="changeTodoStatus(todo)"
+            />
+            <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
+            <button class="destroy" @click.prevent="deleteTodo(todo)"></button>
+          </div>
+          <input
+            type="text"
+            class="edit"
+            v-model="todo.name"
+            @keyup.enter="doneEditing()"
+            @blur="doneEditing()"
+            @keyup.esc="cancelEditing()"
+            v-focus="todo == editing"
+          />
         </li>
       </ul>
     </div>
-    
-    <footer class="footer" v-show="hasTodos">
-      <span class="todo-count"><strong>{{ remaining }}</strong> tâches à faire</span>
+
+    <footer class="footer pb-10" v-show="hasTodos">
+      <span class="todo-count"
+        ><strong>{{ remaining }}</strong> tâches à faire</span
+      >
       <ul class="filters">
-        <li><a href="#" :class="{selected: filter === 'all'}" @click.prevent="filter = 'all'">Toutes</a></li>
-        <li><a href="#" :class="{selected: filter === 'todo'}" @click.prevent="filter = 'todo'">A faire</a></li>
-        <li><a href="#" :class="{selected: filter === 'done'}" @click.prevent="filter = 'done'">Faites</a></li>
+        <li>
+          <a
+            href="#"
+            :class="{ selected: filter === 'all' }"
+            @click.prevent="filter = 'all'"
+            >Toutes</a
+          >
+        </li>
+        <li>
+          <a
+            href="#"
+            :class="{ selected: filter === 'todo' }"
+            @click.prevent="filter = 'todo'"
+            >A faire</a
+          >
+        </li>
+        <li>
+          <a
+            href="#"
+            :class="{ selected: filter === 'done' }"
+            @click.prevent="filter = 'done'"
+            >Faites</a
+          >
+        </li>
       </ul>
-      <button class="clear-completed" v-show="completed" @click.prevent="deleteCompleted">Supprimer les tâches finies</button>
+      <button
+        class="clear-completed"
+        v-show="completed"
+        @click.prevent="deleteCompleted"
+      >
+        Supprimer les tâches finies
+      </button>
     </footer>
-    
   </section>
 </template>
 
 <script>
-export default {
-  name: 'TodoList',
-  data () {
-    return {
-      todos: [
-        {
-          id: 1,
-          name : 'premiere tache',
-          completed : false
-        },
-        {
-          id : 2,
-          name : 'seconde tache',
-          completed : true
-        }
+import { mapActions, mapGetters } from "vuex";
 
-      ],
-      newTodo: '',
-      filter: 'all',
+export default {
+  name: "TodoList",
+  data() {
+    return {
+      newTodo: "",
+      filter: "all",
       editing: null,
-      oldTodo: '',
-      editedTodo
-    }
+      oldTodo: "",
+      editedTodo: "",
+    };
+  },
+  props: {
+    list_id: { type: Number, default: 1 },
   },
   methods: {
-    addTodo(){
-      this.todos.push({
-        id : this.todos.length + 1,
-        completed:false,
-        name : this.newTodo
-      })
-      this.newTodo = '' 
+    ...mapActions("todolist", [
+      "getTodosForList",
+      "createTodo",
+      "toggleCompleteTodo",
+    ]),
+    addTodo() {
+      this.createTodo({
+        name: this.newTodo,
+        completed: false,
+        todolist_id: this.list_id,
+      });
+      this.newTodo = "";
     },
-    editTodo(todo){
-      this.todos.indexOf(todo).name = todo.name
+    changeTodoStatus(todo) {
+      this.toggleCompleteTodo({
+        id: todo.id,
+        completed: todo.completed,
+      });
     },
-    deleteTodo(todo){
+    editTodo(todo) {
+      this.oldTodo = todo.name;
+      this.editing = todo;
+    },
+    doneEditing() {
+      this.editing = null;
+    },
+    cancelEditing() {
+      this.editing.name = this.oldTodo;
+      this.doneEditing();
+    },
+    deleteTodo(todo) {
       var index = this.todos.indexOf(todo);
       this.todos.splice(index, 1);
-    }
+    },
   },
   computed: {
-    remaining () { 
-      //return this.todos.filter(todo => !todo.completed).length 
-      return this.todos.filter(function (todo){
-        return !todo.completed
-      }).length
+    ...mapGetters("todolist", ["getListById"]),
+    todolist() {
+      return this.getListById(this.list_id);
     },
-    hasTodos () {
-      return this.todos.length > 0
+    todos() {
+      return this.todolist.todos;
     },
-    filteredTodos () {
-      if (this.filter === 'todo') {
-        return this.todos.filter(todo => !todo.completed)
-      } else if (this.filter === 'done') {
-        return this.todos.filter(todo => todo.completed)
+    remaining() {
+      return this.todos.filter(function(todo) {
+        return !todo.completed;
+      }).length;
+    },
+    hasTodos() {
+      return this.todos.length > 0;
+    },
+    filteredTodos() {
+      if (this.filter === "todo") {
+        return this.todos.filter((todo) => !todo.completed);
+      } else if (this.filter === "done") {
+        return this.todos.filter((todo) => todo.completed);
       }
-      return this.todos
-    }
-  }
-}
+      return this.todos;
+    },
+    doneTodos() {
+      return this.todos.filter((todo) => todo.completed);
+    },
+    notdoneTodos() {
+      return this.todos.filter((todo) => !todo.completed);
+    },
+  },
+  directives: {
+    focus(el, value) {
+      if (value) {
+        el.focus();
+      }
+    },
+  },
+};
 </script>
-
 
 <style src="./app.css"></style>
