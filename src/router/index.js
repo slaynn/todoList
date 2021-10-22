@@ -13,6 +13,13 @@ const routes = [
     name: "Login",
     component: Login,
   },
+  /*
+  {
+    path: "/todolist/:id?",
+    name: "todolist",
+    component: () => import("../components/TodoList.vue"),
+  },
+  */
 ];
 
 const router = createRouter({

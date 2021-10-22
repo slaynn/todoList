@@ -40,64 +40,6 @@
           />
         </li>
       </ul>
-      <ul class="todo-list">
-        Encours
-        <li
-          class="todo"
-          v-for="todo in notdoneTodos"
-          v-bind:key="todo.id"
-          :class="{ completed: todo.completed, editing: todo == editing }"
-        >
-          <div class="view">
-            <input
-              type="checkbox"
-              v-model="todo.completed"
-              class="toggle"
-              v-on:change="changeTodoStatus(todo)"
-            />
-            <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
-            <button class="destroy" @click.prevent="deleteTodo(todo)"></button>
-          </div>
-          <input
-            type="text"
-            class="edit"
-            v-model="todo.name"
-            @keyup.enter="doneEditing()"
-            @blur="doneEditing()"
-            @keyup.esc="cancelEditing()"
-            v-focus="todo == editing"
-          />
-        </li>
-      </ul>
-      <ul class="todo-list">
-        Finies
-        <li
-          class="todo"
-          v-for="todo in doneTodos"
-          v-bind:key="todo.id"
-          :class="{ completed: todo.completed, editing: todo == editing }"
-        >
-          <div class="view">
-            <input
-              type="checkbox"
-              v-model="todo.completed"
-              class="toggle"
-              v-on:change="changeTodoStatus(todo)"
-            />
-            <label @dblclick="editTodo(todo)">{{ todo.name }}</label>
-            <button class="destroy" @click.prevent="deleteTodo(todo)"></button>
-          </div>
-          <input
-            type="text"
-            class="edit"
-            v-model="todo.name"
-            @keyup.enter="doneEditing()"
-            @blur="doneEditing()"
-            @keyup.esc="cancelEditing()"
-            v-focus="todo == editing"
-          />
-        </li>
-      </ul>
     </div>
 
     <footer class="footer pb-10" v-show="hasTodos">

@@ -17,7 +17,9 @@ export function remainingTodos(state) {
   var i = 0;
   if (state.todoLists.length > 0) {
     state.todoLists.forEach((list) => {
-      i = i + list.todos.filter((todo) => !todo.completed).length;
+      if ("todos" in list) {
+        i = i + list.todos.filter((todo) => !todo.completed).length;
+      }
     });
   }
 
