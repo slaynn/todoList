@@ -18,7 +18,7 @@ export default {
   },
   mounted() {
     if (!this.isLoggedIn) {
-      this.$router.push({ name: "Login", query: { redirect: "/login" } });
+      //this.$router.push({ name: "Login", query: { redirect: "/login" } });
     }
   },
   data() {

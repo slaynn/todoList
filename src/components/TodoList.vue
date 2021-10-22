@@ -145,9 +145,13 @@ export default {
       return this.todolist.todos;
     },
     remaining() {
-      return this.todos.filter(function(todo) {
-        return !todo.completed;
-      }).length;
+      if (this.todos.length > 0) {
+        return this.todos.filter(function(todo) {
+          return !todo.completed;
+        }).length;
+      } else {
+        return 0;
+      }
     },
     hasTodos() {
       return this.todos.length > 0;
